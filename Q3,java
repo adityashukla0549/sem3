@@ -1,0 +1,73 @@
+import java.util.Arrays;
+
+class BaseLibraryMember {
+    private String memberId;
+    private int borrowLimit;
+    private int booksBorrowed;
+    private int[] fineHistory;
+    private int fineCount;
+
+    public BaseLibraryMember(String memberId, int borrowLimit) {
+        if (memberId == null || memberId.trim().length() < 4) {
+            throw new IllegalArgumentException("Invalid memberId");
+        }
+        this.memberId = memberId;
+        this.borrowLimit = borrowLimit;
+        this.booksBorrowed = 0;
+        this.fineHistory = new int[10];
+        this.fineCount = 0;
+    }
+
+    protected void chargeFine(int amount) {
+        if (fineCount < fineHistory.length) {
+            fineHistory[fineCount++] = amount;
+        }
+    }
+
+    public int[] getFineHistory() {
+        return Arrays.copyOf(fineHistory, fineCount);
+    }
+
+    public int getTotalFine() {
+        int total = 0;
+        for (int i = 0; i < fineCount; i++) {
+            total += fineHistory[i];
+        }
+        return total;
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
+}
+
+class StudentMember extends BaseLibraryMember {
+    private String course;
+
+    public StudentMember(String memberId, int borrowLimit, String course) {
+        super(memberId, borrowLimit);
+        this.course = course;
+    }
+
+    @Override
+    protected void chargeFine(int amount) {
+        super.chargeFine(amount / 2);
+    }
+
+    public String getCourse() {
+        return course;
+    }
+}
+
+public class Q3 {
+    public static void main(String[] args) {
+        StudentMember s = new StudentMember("STU5", 3, "CSE");
+        s.chargeFine(100);
+        System.out.println("Total Fine: " + s.getTotalFine());
+
+        int[] history = s.getFineHistory();
+        history[0] = 999; 
+
+        System.out.println("Fine History: " + Arrays.toString(s.getFineHistory()));
+    }
+}
